@@ -8,5 +8,6 @@ import (
 func InitRouter() *gin.Engine {
 	router := gin.Default()
 	router.POST("/user", handler.SaveUser)
+	router.POST("/userList", handler.UserList)
 	return router
 }
