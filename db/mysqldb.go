@@ -2,20 +2,23 @@ package db
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/magiconair/properties"
+	"github.com/usermanage/util"
 )
 
 var Db *sql.DB
 
 func InitMysqlDb() {
-	db, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/user_manage")
+	p := properties.MustLoadFile(util.Args.Db, properties.UTF8)
+	db, err := sql.Open("mysql", p.MustGetString("url"))
 	if err != nil {
 		panic(err)
 	}
-	// See "Important settings" section.
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
+	db.SetConnMaxLifetime(time.Minute * time.Duration(p.GetInt("connMaxLifetime", 3)))
+	db.SetMaxOpenConns(p.GetInt("maxOpenConns", 10))
+	db.SetMaxIdleConns(p.GetInt("maxIdleConns", 10))
 	Db = db
 }
